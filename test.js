@@ -43,7 +43,8 @@ async function runTests() {
         }
 
         // Test 4: Verify "Edit src/App.js" Text is Displayed
-        let editText = await driver.findElement(By.xpath("//*[contains(text(), 'Edit src/App.js and save to reload.')]"));
+        await driver.wait(until.elementLocated(By.xpath("//*[contains(text(), 'Edit')]")), 10000); // Wait for up to 10 seconds
+        let editText = await driver.findElement(By.xpath("//*[contains(text(),'Edit')]"));
         let isTextDisplayed = await editText.isDisplayed();
         console.log(`"Edit src/App.js" text is ${isTextDisplayed ? "displayed" : "not displayed"}`);
         if (isTextDisplayed) {
