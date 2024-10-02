@@ -23,10 +23,10 @@ pipeline {
                     // Start the application container
                     sh 'docker run -d -p 3000:3000 --name myapp $IMAGE_NAME'
                     
-                    // Install necessary packages
+                    // Install necessary packages (ensure selenium-webdriver is available)
                     sh 'npm install selenium-webdriver'
 
-                    // Run the Selenium tests using headless Chrome
+                    // Run the Selenium tests
                     sh 'node test.js'
 
                     // Stop and remove the Docker container after tests
