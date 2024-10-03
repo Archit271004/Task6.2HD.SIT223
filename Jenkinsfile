@@ -4,6 +4,8 @@ pipeline {
     environment {
         IMAGE_NAME = 'myapp/hdtask6.2'
         CONTAINER_NAME = 'myapp'
+        NETLIFY_SITE_ID = '4c9e472c-bbad-4558-b6f3-d02912a59926' 
+        NETLIFY_AUTH_TOKEN = credentials('nfp_tJQWcC6kBNY39JyYgzDuzheCxSqwejDvf532') 
     }
 
     stages {
@@ -39,6 +41,22 @@ pipeline {
 
                     // Stop and remove the Docker container after tests
                     sh 'docker stop $CONTAINER_NAME && docker rm $CONTAINER_NAME'
+                }
+            }
+        }
+
+        stage('Deploy to Netlify') {
+            steps {
+                script {
+                    echo 'Deploying to Netlify...'
+
+                    // Install Netlify CLI
+                    sh 'npm install -g netlify-cli'
+
+                    // Deploy the site using Netlify CLI
+                    sh '''
+                    netlify deploy --prod --dir=build --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
+                    '''
                 }
             }
         }
