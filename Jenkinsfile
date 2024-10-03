@@ -45,6 +45,13 @@ pipeline {
             }
         }
 
+        stage('Build React App') {
+            steps {
+                echo 'Building React App for production...'
+                sh 'npm run build' // This will generate the ./build directory
+            }
+        }
+
         stage('Deploy to Netlify') {
             steps {
                 script {
