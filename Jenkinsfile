@@ -5,12 +5,12 @@ pipeline {
         IMAGE_NAME = 'myapp/hdtask6.2'
         CONTAINER_NAME = 'myapp'
         NETLIFY_SITE_ID = '4c9e472c-bbad-4558-b6f3-d02912a59926' 
-        NETLIFY_AUTH_TOKEN = credentials('nfp_tJQWcC6kBNY39JyYgzDuzheCxSqwejDvf532') 
-        DATADOG_API_KEY = credentials('datadog_api_key') // Storing Datadog API key securely in Jenkins credentials
+        NETLIFY_AUTH_TOKEN = credentials('NFP_TJQWC6KBNY39JYYGZDUZHECXSQWEJDVF532') 
+        DATADOG_API_KEY = credentials('DATADOG_API_KEY') // Make sure this credential is added in Jenkins
     }
 
     stages {
-        stage('Build') {
+        stage('BUILD') {
             steps {
                 script {
                     echo 'Building Docker image...'
@@ -19,7 +19,7 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('TEST') {
             steps {
                 script {
                     echo 'Running Selenium tests...'
@@ -46,14 +46,14 @@ pipeline {
             }
         }
 
-        stage('Build React App') {
+        stage('BUILD REACT APP') {
             steps {
                 echo 'Building React App for production...'
                 sh 'npm run build' // This will generate the ./build directory
             }
         }
 
-        stage('Deploy to Netlify') {
+        stage('DEPLOY TO NETLIFY') {
             steps {
                 script {
                     echo 'Deploying to Netlify...'
@@ -69,7 +69,7 @@ pipeline {
             }
         }
 
-        stage('Monitoring') {
+        stage('MONITORING') {
             steps {
                 script {
                     echo 'Integrating Datadog monitoring...'
@@ -88,7 +88,7 @@ pipeline {
                             "points": [[`date +%s`, 1]],
                             "tags": ["project:myapp", "env:production"],
                             "type": "gauge",
-                            "host": "Jenkins"
+                            "host": "JENKINS"
                         }]
                     }'
                     '''
@@ -99,8 +99,12 @@ pipeline {
 
     post {
         always {
-            echo 'Cleaning up the workspace...'
-            cleanWs()
+            script {
+                node {
+                    echo 'Cleaning up the workspace...'
+                    cleanWs()
+                }
+            }
         }
     }
 }
