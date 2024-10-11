@@ -75,7 +75,7 @@ pipeline {
                     echo 'Integrating Datadog monitoring...'
                     // This will display monitoring information
                     echo "Monitoring URL: https://hdtaskk.netlify.app"
-                    ech "Check the Datadog dashboard for live status updates."
+                    echo "Check the Datadog dashboard for live status updates."
 
                     // Optional: Push custom metrics to Datadog (e.g., Jenkins job status or app health)
                     sh '''
