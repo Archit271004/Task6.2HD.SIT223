@@ -106,5 +106,12 @@ pipeline {
                 }
             }
         }
+        success {
+            emailext(
+                subject: "Jenkins Job Success - ${env.JOB_NAME}",
+                body: "The job ${env.JOB_NAME} has completed successfully. You can check the details at ${env.BUILD_URL}.",
+                to: "archit7787@gmail.com"
+            )
+        }
     }
 }
