@@ -5,7 +5,8 @@ pipeline {
         IMAGE_NAME = 'myapp/hdtask6.2'
         CONTAINER_NAME = 'myapp'
         NETLIFY_SITE_ID = '4c9e472c-bbad-4558-b6f3-d02912a59926' 
-        NETLIFY_AUTH_TOKEN = credentials('nfp_tJQWcC6kBNY39JyYgzDuzheCxSqwejDvf532')
+        NETLIFY_AUTH_TOKEN = credentials('nfp_tJQWcC6kBNY39JyYgzDuzheCxSqwejDvf532') 
+        DATADOG_API_KEY = credentials('datadog_api_key') // Storing Datadog API key securely in Jenkins credentials
     }
 
     stages {
@@ -72,8 +73,25 @@ pipeline {
             steps {
                 script {
                     echo 'Integrating Datadog monitoring...'
-                    echo 'Monitoring URL: https://hdtaskk.netlify.app'
-                    echo 'Check the Datadog dashboard for live status updates.'
+                    // This will display monitoring information
+                    echo "Monitoring URL: https://hdtaskk.netlify.app"
+                    echo "Check the Datadog dashboard for live status updates."
+
+                    // Optional: Push custom metrics to Datadog (e.g., Jenkins job status or app health)
+                    sh '''
+                    curl -X POST "https://api.datadoghq.com/api/v1/series" \
+                    -H "Content-Type: application/json" \
+                    -H "DD-API-KEY: ${DATADOG_API_KEY}" \
+                    -d '{
+                        "series": [{
+                            "metric": "jenkins.job.status",
+                            "points": [[`date +%s`, 1]],
+                            "tags": ["project:myapp", "env:production"],
+                            "type": "gauge",
+                            "host": "Jenkins"
+                        }]
+                    }'
+                    '''
                 }
             }
         }
@@ -83,32 +101,6 @@ pipeline {
         always {
             echo 'Cleaning up the workspace...'
             cleanWs()
-        }
-        failure {
-            // Send an email if the build fails
-            emailext (
-                subject: "Build Failed - ${env.JOB_NAME}",
-                body: "Build failed at ${env.BUILD_URL}. Please check the details.",
-                to: 'archit7787@gmail.com'
-            )
-
-            // Optional: Send a Datadog alert on failure
-            script {
-                withCredentials([string(credentialsId: 'DATADOG_API_KEY', variable: 'DD_API_KEY')]) {
-                    sh '''
-                    curl -X POST "https://api.datadoghq.com/api/v1/events" \
-                    -H "Content-Type: application/json" \
-                    -H "DD-API-KEY: ${DD_API_KEY}" \
-                    -d '{
-                            "title": "Jenkins Build Failure Alert",
-                            "text": "Jenkins job ${env.JOB_NAME} failed at ${env.BUILD_URL}",
-                            "priority": "high",
-                            "tags": ["project:myapp", "env:production"],
-                            "alert_type": "error"
-                        }'
-                    '''
-                }
-            }
         }
     }
 }
